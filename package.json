@@ -1,0 +1,22 @@
+{
+  "name": "@opi/tslint-rules",
+  "version": "1.0.0",
+  "description": "TSLint Rules",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://lisi-git.opi.org.pl/tslint-rules"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run-script build"
+  },
+  "peerDependencies": {
+    "tslint": ">=5.9.1",
+    "typescript": ">=2.8.3"
+  },
+  "devDependencies": {
+    "tslint": "5.9.1",
+    "typescript": "2.8.3"
+  }
+}
