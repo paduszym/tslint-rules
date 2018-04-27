@@ -19,37 +19,28 @@
  * @see https://github.com/angular/material2/blob/master/tools/tslint-rules/requireLicenseBannerRule.ts
  */
 import {readFileSync} from "fs";
-import * as minimatch from "minimatch";
-import {join} from "path";
-import * as TsLint from "tslint";
+import {resolve} from "path";
+import {IOptions, Replacement, RuleFailure, Rules, RuleWalker} from "tslint";
 import {SourceFile} from "typescript";
 
 interface RequireLicenseBannerRuleOptions {
     bannerFile: string;
-    filePattern: string;
 }
 
 interface RequireLicenseBannerWalkerConfig extends RequireLicenseBannerRuleOptions {
     bannerContent: string;
 }
 
-class RequireLicenseBannerWalker extends TsLint.RuleWalker {
+class RequireLicenseBannerWalker extends RuleWalker {
 
-    private _enabled: boolean;
+    private _tslintFix: Replacement;
 
-    private _tslintFix: TsLint.Replacement;
-
-    constructor(sourceFile: SourceFile, options: TsLint.IOptions, private _config: RequireLicenseBannerWalkerConfig) {
+    constructor(sourceFile: SourceFile, options: IOptions, private _config: RequireLicenseBannerWalkerConfig) {
         super(sourceFile, options);
-        this._enabled = minimatch(join(process.cwd(), sourceFile.fileName), this._config.filePattern);
-        this._tslintFix = TsLint.Replacement.appendText(0, `${this._config.bannerContent}`);
+        this._tslintFix = Replacement.appendText(0, `${this._config.bannerContent}`);
     }
 
     visitSourceFile(sourceFile: SourceFile): void {
-        if (!this._enabled) {
-            return;
-        }
-
         const fileContent: string = sourceFile.getFullText().replace(/\r\n/g, "\n");
         const bannerCommentPos: number = fileContent.indexOf(this._config.bannerContent);
 
@@ -63,23 +54,22 @@ class RequireLicenseBannerWalker extends TsLint.RuleWalker {
     }
 }
 
-export class Rule extends TsLint.Rules.AbstractRule {
+export class Rule extends Rules.AbstractRule {
 
     private _walkerConfig: RequireLicenseBannerWalkerConfig;
 
-    constructor(options: TsLint.IOptions) {
+    constructor(options: IOptions) {
         super(options);
         if (options.ruleArguments && options.ruleArguments.length > 0) {
             const ruleOptions: RequireLicenseBannerRuleOptions = options.ruleArguments[0];
             this._walkerConfig = {
                 bannerFile: ruleOptions.bannerFile,
-                filePattern: ruleOptions.filePattern ? join(__dirname, "..", "..", ruleOptions.filePattern) : "**/*.ts",
-                bannerContent: readFileSync(join(__dirname, "..", "..", ruleOptions.bannerFile)).toString().replace(/\r\n/g, "\n"),
+                bannerContent: readFileSync(resolve(ruleOptions.bannerFile)).toString().replace(/\r\n/g, "\n"),
             };
         }
     }
 
-    apply(sourceFile: SourceFile): TsLint.RuleFailure[] {
+    apply(sourceFile: SourceFile): RuleFailure[] {
         return this.applyWithWalker(new RequireLicenseBannerWalker(sourceFile, this.getOptions(), this._walkerConfig));
     }
 }

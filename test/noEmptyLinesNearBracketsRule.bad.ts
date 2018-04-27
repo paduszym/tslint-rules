@@ -1,7 +1,5 @@
 /**
  * @license
  *
- * Example license banner -- BAD !!!!
+ * Example license banner
  */
-export function foo() {
-}

@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "devel": "tsc -w",
     "prepare": "npm run-script build",
     "test": "tslint -c ./test/tslint-sample.json './test/*.ts'"
   },

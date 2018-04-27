@@ -1,5 +1,11 @@
 /**
  * @license
  *
- * Example license banner
+ * Example license banner FOOOO
  */
+
+/* ^ */
+/* | */
+/* | */
+/* | */
+/* This is BAD license banner */

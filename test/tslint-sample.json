@@ -8,8 +8,7 @@
     "require-license-banner": [
       true,
       {
-        "bannerFile": "./_sample-license-banner.ts",
-        "filePattern": "./*.ts"
+        "bannerFile": "./test/_sample-license-banner.ts"
       }
     ]
   }
