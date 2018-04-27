@@ -14,25 +14,25 @@
  * zgodnie z przeznaczeniem. OPI nie odpowiada za ewentualne wadliwe
  * działanie kodu.
  */
-import * as TsLint from "tslint";
+import {AbstractWalker, RuleFailure, Rules} from "tslint";
 import {isDecorator, isSameLine} from "tsutils";
-import * as ts from "typescript";
+import {forEachChild, Node, SourceFile, SyntaxKind} from "typescript";
 
-export class Rule extends TsLint.Rules.AbstractRule {
+export class Rule extends Rules.AbstractRule {
 
-    apply(sourceFile: ts.SourceFile): TsLint.RuleFailure[] {
+    apply(sourceFile: SourceFile): RuleFailure[] {
         return this.applyWithWalker(new NoSingleLineDecoratorsWalker(sourceFile, this.ruleName, {}));
     }
 }
 
-function isDecoratorInConstructor(node: ts.Node): boolean {
-    return (node && node.parent && node.parent.parent && node.parent.parent.kind === ts.SyntaxKind.Constructor);
+function isDecoratorInConstructor(node: Node): boolean {
+    return (node && node.parent && node.parent.parent && node.parent.parent.kind === SyntaxKind.Constructor);
 }
 
-class NoSingleLineDecoratorsWalker extends TsLint.AbstractWalker<any> {
+class NoSingleLineDecoratorsWalker extends AbstractWalker<any> {
 
-    walk(sourceFile: ts.SourceFile): void {
-        const callback: any = (node: ts.Node): void => {
+    walk(sourceFile: SourceFile): void {
+        const callback: any = (node: Node): void => {
             if (isDecorator(node) && node.parent) {
                 const decoratedExpressionEnd: number = node.parent.getChildAt(1, this.sourceFile).end;
 
@@ -44,9 +44,9 @@ class NoSingleLineDecoratorsWalker extends TsLint.AbstractWalker<any> {
                 }
             }
 
-            return ts.forEachChild(node, callback);
+            return forEachChild(node, callback);
         };
 
-        return ts.forEachChild(sourceFile, callback);
+        return forEachChild(sourceFile, callback);
     }
 }

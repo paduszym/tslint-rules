@@ -14,7 +14,7 @@
  * zgodnie z przeznaczeniem. OPI nie odpowiada za ewentualne wadliwe
  * działanie kodu.
  */
-import * as TsLint from "tslint";
+import {AbstractWalker, RuleFailure, Rules} from "tslint";
 import {
     isArrayLiteralExpression,
     isBlock,
@@ -25,16 +25,16 @@ import {
     isSameLine,
     isTypeAliasDeclaration,
 } from "tsutils";
-import * as ts from "typescript";
+import {forEachChild, Node, SourceFile} from "typescript";
 
-export class Rule extends TsLint.Rules.AbstractRule {
+export class Rule extends Rules.AbstractRule {
 
-    apply(sourceFile: ts.SourceFile): TsLint.RuleFailure[] {
+    apply(sourceFile: SourceFile): RuleFailure[] {
         return this.applyWithWalker(new NoEmptyLinesNearBracketsWalker(sourceFile, this.ruleName, {}));
     }
 }
 
-function isBracketExpression(node: ts.Node): boolean {
+function isBracketExpression(node: Node): boolean {
     return isBlock(node) ||
         isClassDeclaration(node) ||
         isInterfaceDeclaration(node) ||
@@ -44,16 +44,16 @@ function isBracketExpression(node: ts.Node): boolean {
         isCallExpression(node);
 }
 
-function canHaveOpeningBlankLine(node: ts.Node): boolean {
+function canHaveOpeningBlankLine(node: Node): boolean {
     return isBlock(node) ||
         isClassDeclaration(node) ||
         isInterfaceDeclaration(node);
 }
 
-class NoEmptyLinesNearBracketsWalker extends TsLint.AbstractWalker<any> {
+class NoEmptyLinesNearBracketsWalker extends AbstractWalker<any> {
 
-    walk(sourceFile: ts.SourceFile): void {
-        const callback: any = (node: ts.Node): void => {
+    walk(sourceFile: SourceFile): void {
+        const callback: any = (node: Node): void => {
             if (isBracketExpression(node) && !isSameLine(this.sourceFile, node.pos, node.end)) {
                 const expressionLines: string[] = node.getText(this.sourceFile).split("\n");
 
@@ -73,9 +73,9 @@ class NoEmptyLinesNearBracketsWalker extends TsLint.AbstractWalker<any> {
                 }
             }
 
-            return ts.forEachChild(node, callback);
+            return forEachChild(node, callback);
         };
 
-        return ts.forEachChild(sourceFile, callback);
+        return forEachChild(sourceFile, callback);
     }
 }
