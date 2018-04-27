@@ -10,7 +10,8 @@
       "es2015",
       "dom"
     ],
-    "outDir": "dist"
+    "outDir": ".",
+    "declaration": true
   },
   "exclude": [
     "node_modules"

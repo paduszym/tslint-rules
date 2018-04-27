@@ -1,5 +1,5 @@
 .idea
 .editorconfig
+src
 test
 tsconfig.json
-*.ts

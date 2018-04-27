@@ -24,3 +24,6 @@ node_modules
 dist
 npm-debug.log
 coverage
+
+/*.js
+/*.d.ts
