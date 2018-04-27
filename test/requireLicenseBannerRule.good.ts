@@ -1,0 +1,5 @@
+/**
+ * @license
+ *
+ * Example license banner
+ */

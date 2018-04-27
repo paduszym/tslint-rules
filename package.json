@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run-script build"
+    "prepare": "npm run-script build",
+    "test": "tslint -c ./test/tslint-sample.json './test/*.ts'"
   },
   "peerDependencies": {
     "tslint": ">=5.9.1",

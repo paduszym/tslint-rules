@@ -1,0 +1,16 @@
+{
+  "rulesDirectory": [
+    "../dist"
+  ],
+  "rules": {
+    "no-empty-lines-near-brackets": true,
+    "no-single-line-decorators": true,
+    "require-license-banner": [
+      true,
+      {
+        "bannerFile": "./_sample-license-banner.ts",
+        "filePattern": "./*.ts"
+      }
+    ]
+  }
+}

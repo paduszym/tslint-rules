@@ -10,7 +10,7 @@
       "es2015",
       "dom"
     ],
-    "outDir": ".",
+    "outDir": "dist",
     "declaration": true
   },
   "exclude": [
