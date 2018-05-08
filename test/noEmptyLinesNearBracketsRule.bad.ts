@@ -38,7 +38,13 @@ function f(a: any, b: any, c: any): void {
 
     ];
 
-    if (a === 1) {
+    if (
+        (
+
+            a === 1
+
+        )
+    ) {
 
         console.log("OK");
 

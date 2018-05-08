@@ -22,6 +22,7 @@ import {
     isClassDeclaration,
     isInterfaceDeclaration,
     isObjectLiteralExpression,
+    isParenthesizedExpression,
     isSameLine,
     isTypeAliasDeclaration,
 } from "tsutils";
@@ -36,6 +37,7 @@ export class Rule extends Rules.AbstractRule {
 
 function isBracketExpression(node: Node): boolean {
     return isBlock(node) ||
+        isParenthesizedExpression(node) ||
         isClassDeclaration(node) ||
         isInterfaceDeclaration(node) ||
         isTypeAliasDeclaration(node) ||
