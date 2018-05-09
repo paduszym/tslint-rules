@@ -18,13 +18,6 @@ import {AbstractWalker, RuleFailure, Rules} from "tslint";
 import {isDecorator, isSameLine} from "tsutils";
 import {forEachChild, Node, SourceFile, SyntaxKind} from "typescript";
 
-export class Rule extends Rules.AbstractRule {
-
-    apply(sourceFile: SourceFile): RuleFailure[] {
-        return this.applyWithWalker(new NoSingleLineDecoratorsWalker(sourceFile, this.ruleName, {}));
-    }
-}
-
 function isDecoratorInConstructor(node: Node): boolean {
     return (node && node.parent && node.parent.parent && node.parent.parent.kind === SyntaxKind.Constructor);
 }
@@ -48,5 +41,12 @@ class NoSingleLineDecoratorsWalker extends AbstractWalker<any> {
         };
 
         return forEachChild(sourceFile, callback);
+    }
+}
+
+export class Rule extends Rules.AbstractRule {
+
+    apply(sourceFile: SourceFile): RuleFailure[] {
+        return this.applyWithWalker(new NoSingleLineDecoratorsWalker(sourceFile, this.ruleName, {}));
     }
 }

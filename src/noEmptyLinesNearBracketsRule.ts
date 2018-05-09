@@ -28,13 +28,6 @@ import {
 } from "tsutils";
 import {forEachChild, Node, SourceFile} from "typescript";
 
-export class Rule extends Rules.AbstractRule {
-
-    apply(sourceFile: SourceFile): RuleFailure[] {
-        return this.applyWithWalker(new NoEmptyLinesNearBracketsWalker(sourceFile, this.ruleName, {}));
-    }
-}
-
 function isBracketExpression(node: Node): boolean {
     return isBlock(node) ||
         isParenthesizedExpression(node) ||
@@ -79,5 +72,12 @@ class NoEmptyLinesNearBracketsWalker extends AbstractWalker<any> {
         };
 
         return forEachChild(sourceFile, callback);
+    }
+}
+
+export class Rule extends Rules.AbstractRule {
+
+    apply(sourceFile: SourceFile): RuleFailure[] {
+        return this.applyWithWalker(new NoEmptyLinesNearBracketsWalker(sourceFile, this.ruleName, {}));
     }
 }
