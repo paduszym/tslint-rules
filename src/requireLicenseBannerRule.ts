@@ -19,7 +19,7 @@
  * @see https://github.com/angular/material2/blob/master/tools/tslint-rules/requireLicenseBannerRule.ts
  */
 import {readFileSync} from "fs";
-import {resolve} from "path";
+import {resolve, dirname} from "path";
 import {IOptions, Replacement, RuleFailure, Rules, RuleWalker} from "tslint";
 import {SourceFile} from "typescript";
 
@@ -29,6 +29,13 @@ interface RequireLicenseBannerRuleOptions {
 
 interface RequireLicenseBannerWalkerConfig extends RequireLicenseBannerRuleOptions {
     bannerContent: string;
+}
+
+function getTsLintConfigDir(): string {
+    const tslintConfigArgvIndex: number = process.argv.findIndex(arg => arg === "-c" || arg === "--config");
+    const tslintConfigFile: string = tslintConfigArgvIndex > -1 ? process.argv[tslintConfigArgvIndex + 1] : "./tsconfig.json";
+
+    return dirname(resolve(tslintConfigFile));
 }
 
 class RequireLicenseBannerWalker extends RuleWalker {
@@ -62,9 +69,11 @@ export class Rule extends Rules.AbstractRule {
         super(options);
         if (options.ruleArguments && options.ruleArguments.length > 0) {
             const ruleOptions: RequireLicenseBannerRuleOptions = options.ruleArguments[0];
+            const bannerFile: string = resolve(getTsLintConfigDir(), ruleOptions.bannerFile);
+
             this._walkerConfig = {
-                bannerFile: ruleOptions.bannerFile,
-                bannerContent: readFileSync(resolve(ruleOptions.bannerFile)).toString().replace(/\r\n/g, "\n"),
+                bannerFile,
+                bannerContent: readFileSync(bannerFile).toString().replace(/\r\n/g, "\n"),
             };
         }
     }
