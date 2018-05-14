@@ -14,4 +14,7 @@ class AClass {
 
     constructor(@XYZ() private _bField: string) {
     }
+
+    method(@XYZ() a: string) {
+    }
 }

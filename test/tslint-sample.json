@@ -4,7 +4,7 @@
   ],
   "rules": {
     "no-empty-lines-near-brackets": true,
-    "no-single-line-decorators": true,
+    "consistent-decorators": true,
     "require-license-banner": [
       true,
       {

@@ -10,6 +10,11 @@ function XYZ() {
 
     @XYZ() aField: string;
 
-    constructor(@XYZ() private _bField: string) {
+    constructor(@XYZ()
+                private _bField: string) {
+    }
+
+    method(@XYZ()
+           a: string) {
     }
 }
