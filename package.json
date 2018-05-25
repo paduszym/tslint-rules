@@ -12,13 +12,14 @@
     "clean": "rimraf ./dist",
     "devel": "tsc -w",
     "prepublishOnly": "npm run-script build",
-    "test": "tslint -c ./test/tslint-sample.json './test/*.ts'"
+    "test": "tslint -c ./test/tslint-sample.json './test/ng-*.ts'"
   },
   "peerDependencies": {
     "tslint": ">=5.9.1",
     "typescript": ">=2.7.2"
   },
   "devDependencies": {
+    "@angular/core": "6.0.2",
     "@types/node": "9.6.6",
     "rimraf": "2.6.2",
     "tslint": "5.9.1",
