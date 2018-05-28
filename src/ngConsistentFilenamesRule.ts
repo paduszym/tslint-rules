@@ -85,39 +85,39 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
 
     private _validateNgModuleNaming(className: string): void {
         if (!this._isConsistentFileNaming(className, "Module", "module")) {
-            this.addFailure(0, 0, `Niespójność w nazewnictwie modułu Angularowego (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Niespójność w nazewnictwie modułu Angularowego");
         }
     }
 
     private _validateNgServiceNaming(className: string): void {
         if (!this._isConsistentFileNaming(className, "Service", "service")) {
-            this.addFailure(0, 0, `Niespójność w nazewnictwie serwisu Angularowego (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Niespójność w nazewnictwie serwisu Angularowego");
         }
     }
 
     private _validateNgComponentNaming(className: string, params: Expression): void {
         if (!this._isConsistentFileNaming(className, "Component", "component")) {
-            this.addFailure(0, 0, `Niespójność w nazewnictwie komponentu Angularowego (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Niespójność w nazewnictwie komponentu Angularowego");
         }
         if (!this._isConsistentSelectorNaming(className, "Component", params,
                 (ngClassName, selector) => ngClassName === dashCaseToCamelCase(selector.replace(/^test/, "")))) {
-            this.addFailure(0, 0, `Selektor niezgodny z nazwą klasy komponentu Angularowego (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Selektor niezgodny z nazwą klasy komponentu Angularowego");
         }
     }
 
     private _validateNgDirectiveNaming(className: string, params: Expression): void {
         if (!this._isConsistentFileNaming(className, "Directive", "directive")) {
-            this.addFailure(0, 0, `Niespójność w nazewnictwie dyrektywy Angularowej (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Niespójność w nazewnictwie dyrektywy Angularowej");
         }
         if (!this._isConsistentSelectorNaming(className, "Directive", params,
                 (ngClassName, selector) => selector.match(new RegExp(`\\[test${ngClassName}\\]`)) !== null)) {
-            this.addFailure(0, 0, `Selektor niezgodny z nazwą klasy dyrektywy Angularowej (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Selektor niezgodny z nazwą klasy dyrektywy Angularowej");
         }
     }
 
     private _validateNgPipeNaming(className: string, params: Expression): void {
         if (!this._isConsistentFileNaming(className, "Pipe", "pipe")) {
-            this.addFailure(0, 0, `Niespójność w nazewnictwie pipe'a Angularowego (patrz: ${STYLEGUIDE_URL})`);
+            this._addFailure("Niespójność w nazewnictwie pipe'a Angularowego");
         }
     }
 
@@ -136,6 +136,10 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
         const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
 
         return dashCaseToCamelCase(`-${ngFileName}`) === ngClassName;
+    }
+
+    private _addFailure(message: string): void {
+        this.addFailure(0, 0, `${message} (patrz: ${STYLEGUIDE_URL})`);
     }
 }
 
