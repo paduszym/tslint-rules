@@ -24,7 +24,7 @@ import {
     isPropertyAssignment,
     isStringLiteral,
 } from "tsutils";
-import {forEachChild, CallExpression, Expression, Node, ObjectLiteralExpression, SourceFile} from "typescript";
+import {forEachChild, CallExpression, Expression, Node, SourceFile} from "typescript";
 
 const STYLEGUIDE_URL: string = "https://angular.io/guide/styleguide#symbols-and-file-names";
 
@@ -32,16 +32,19 @@ function dashCaseToCamelCase(str: string): string {
     return str.replace(/-([a-z])/g, g => g[1].toUpperCase());
 }
 
-function getObjectLiteralFromExpression(expression: ObjectLiteralExpression): any {
-    const result: any = {};
+function getObjectLiteralFromExpression(expression: Expression): any {
+    if (expression && isObjectLiteralExpression(expression)) {
+        const result: any = {};
 
-    for (const property of expression.properties) {
-        if (isPropertyAssignment(property) && isIdentifier(property.name) && isStringLiteral(property.initializer)) {
-            result[property.name.escapedText.toString()] = property.initializer.text.toString();
+        for (const property of expression.properties) {
+            if (isPropertyAssignment(property) && isIdentifier(property.name) && isStringLiteral(property.initializer)) {
+                result[property.name.escapedText.toString()] = property.initializer.text.toString();
+            }
         }
-    }
 
-    return result;
+        return result;
+    }
+    return null;
 }
 
 class NgConsistentFilenamesWalker extends AbstractWalker<any> {
@@ -56,17 +59,18 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
                         if (isIdentifier(decoratorCallExpression.expression)) {
                             const className: string = node.name.escapedText.toString();
                             const decoratorName: string = decoratorCallExpression.expression.escapedText.toString();
+                            const decoratorArgs: any = getObjectLiteralFromExpression(decoratorCallExpression.arguments[0]);
 
                             if (decoratorName === "NgModule") {
                                 this._validateNgModuleNaming(className);
                             } else if (decoratorName === "Injectable") {
                                 this._validateNgServiceNaming(className);
                             } else if (decoratorName === "Component") {
-                                this._validateNgComponentNaming(className, decoratorCallExpression.arguments[0]);
+                                this._validateNgComponentNaming(className, decoratorArgs);
                             } else if (decoratorName === "Directive") {
-                                this._validateNgDirectiveNaming(className, decoratorCallExpression.arguments[0]);
+                                this._validateNgDirectiveNaming(className, decoratorArgs);
                             } else if (decoratorName === "Pipe") {
-                                this._validateNgPipeNaming(className, decoratorCallExpression.arguments[0]);
+                                this._validateNgPipeNaming(className, decoratorArgs);
                             }
                         }
                     }
@@ -117,16 +121,12 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
         }
     }
 
-    private _isConsistentSelectorNaming(className: string, classSuffix: string, params: Expression,
+    private _isConsistentSelectorNaming(className: string, classSuffix: string, decoratorParams: any,
                                         matcher: (_ngClassName: string, _selector: string) => boolean): boolean {
-        if (isObjectLiteralExpression(params)) {
-            const decoratorParams: any = getObjectLiteralFromExpression(params);
+        if (typeof decoratorParams["selector"] === "string") {
+            const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
 
-            if (typeof decoratorParams["selector"] === "string") {
-                const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
-
-                return matcher(ngClassName, decoratorParams["selector"]);
-            }
+            return matcher(ngClassName, decoratorParams["selector"]);
         }
         return true;
     }
