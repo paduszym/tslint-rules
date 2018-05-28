@@ -95,7 +95,8 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
         if (!this._isConsistentFileNaming(className, "Component", "component")) {
             this.addFailure(0, 0, `Niespójność w nazewnictwie komponentu Angularowego (patrz: ${STYLEGUIDE_URL})`);
         }
-        if (!this._isConsistentSelectorNaming(className, "Component", params, selector => dashCaseToCamelCase(selector.replace(/^test/, "")))) {
+        if (!this._isConsistentSelectorNaming(className, "Component", params,
+                (ngClassName, selector) => ngClassName === dashCaseToCamelCase(selector.replace(/^test/, "")))) {
             this.addFailure(0, 0, `Selektor niezgodny z nazwą klasy komponentu Angularowego (patrz: ${STYLEGUIDE_URL})`);
         }
     }
@@ -105,8 +106,8 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
             this.addFailure(0, 0, `Niespójność w nazewnictwie dyrektywy Angularowej (patrz: ${STYLEGUIDE_URL})`);
         }
         if (!this._isConsistentSelectorNaming(className, "Directive", params,
-                selector => selector.replace(/\[test([^\]]+)/g, "["))) {
-            this.addFailure(0, 0, `Selektor niezgodny z nazwą klasy komponentu Angularowego (patrz: ${STYLEGUIDE_URL})`);
+                (ngClassName, selector) => selector.match(new RegExp(`\\[test${ngClassName}\\]`)) !== null)) {
+            this.addFailure(0, 0, `Selektor niezgodny z nazwą klasy dyrektywy Angularowej (patrz: ${STYLEGUIDE_URL})`);
         }
     }
 
@@ -116,14 +117,15 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
         }
     }
 
-    private _isConsistentSelectorNaming(className: string, classSuffix: string, params: Expression, selectorTransform: (s: string) => string): boolean {
+    private _isConsistentSelectorNaming(className: string, classSuffix: string, params: Expression,
+                                        matcher: (_ngClassName: string, _selector: string) => boolean): boolean {
         if (isObjectLiteralExpression(params)) {
             const decoratorParams: any = getObjectLiteralFromExpression(params);
 
             if (typeof decoratorParams["selector"] === "string") {
                 const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
 
-                return ngClassName === selectorTransform(decoratorParams["selector"]);
+                return matcher(ngClassName, decoratorParams["selector"]);
             }
         }
         return true;
