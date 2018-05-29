@@ -11,6 +11,11 @@
 //        "bannerFile": "./_sample-license-banner.ts"
 //      }
 //    ],
-    "ng-consistent-filenames": true
+    "ng-consistent-naming": [
+      true,
+      {
+        "vendorPrefixes": ["test"]
+      }
+    ]
   }
 }

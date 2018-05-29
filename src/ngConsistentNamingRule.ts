@@ -15,7 +15,7 @@
  * działanie kodu.
  */
 import {basename} from "path";
-import {AbstractWalker, RuleFailure, Rules} from "tslint";
+import {AbstractWalker, IOptions, RuleFailure, Rules} from "tslint";
 import {
     isCallExpression,
     isClassDeclaration,
@@ -27,6 +27,10 @@ import {
 import {forEachChild, CallExpression, Expression, Node, SourceFile} from "typescript";
 
 const STYLEGUIDE_URL: string = "https://angular.io/guide/styleguide#symbols-and-file-names";
+
+interface NgConsistentNamingRuleOptions {
+    vendorPrefixes: string[];
+}
 
 function dashCaseToCamelCase(str: string): string {
     return str.replace(/-([a-z])/g, g => g[1].toUpperCase());
@@ -64,7 +68,7 @@ function isConsistentFileNaming(fileName: string, className: string, classSuffix
     return dashCaseToCamelCase(`-${ngFileName}`) === ngClassName;
 }
 
-class NgConsistentFilenamesWalker extends AbstractWalker<any> {
+class NgConsistentNamingWalker extends AbstractWalker<NgConsistentNamingRuleOptions> {
 
     walk(sourceFile: SourceFile): void {
         const callback: any = (node: Node): void => {
@@ -113,6 +117,8 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
     }
 
     private _validateNgComponentNaming(className: string, params: any): void {
+        const vendorSelectorRegex: RegExp = new RegExp(`^(${this.options.vendorPrefixes.join("|")})`);
+
         if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Component", ".component.ts")) {
             this._addFailure("Niespójność w nazewnictwie komponentu Angularowego");
         }
@@ -120,17 +126,19 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
             this._addFailure("Niespójność w nazewnictwie szablonu komponentu Angularowego");
         }
         if (!isConsistentNgNaming(className, "Component", params["selector"],
-                (ngClassName, selector) => ngClassName === dashCaseToCamelCase(selector.replace(/^test/, "")))) {
+                (ngClassName, selector) => ngClassName === dashCaseToCamelCase(selector.replace(vendorSelectorRegex, "")))) {
             this._addFailure("Selektor niezgodny z nazwą klasy komponentu Angularowego");
         }
     }
 
     private _validateNgDirectiveNaming(className: string, params: any): void {
+        const vendorPrefixes: string = this.options.vendorPrefixes.join("|");
+
         if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Directive", ".directive.ts")) {
             this._addFailure("Niespójność w nazewnictwie dyrektywy Angularowej");
         }
         if (!isConsistentNgNaming(className, "Directive", params["selector"],
-                (ngClassName, selector) => selector.match(new RegExp(`\\[test${ngClassName}\\]`)) !== null)) {
+                (ngClassName, selector) => selector.match(new RegExp(`\\[${vendorPrefixes}${ngClassName}\\]`)) !== null)) {
             this._addFailure("Selektor niezgodny z nazwą klasy dyrektywy Angularowej");
         }
     }
@@ -152,7 +160,16 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
 
 export class Rule extends Rules.AbstractRule {
 
+    private _walkerOptions: NgConsistentNamingRuleOptions = { vendorPrefixes: [] };
+
+    constructor(options: IOptions) {
+        super(options);
+        if (options.ruleArguments && options.ruleArguments.length > 0) {
+            this._walkerOptions = options.ruleArguments[0];
+        }
+    }
+
     apply(sourceFile: SourceFile): RuleFailure[] {
-        return this.applyWithWalker(new NgConsistentFilenamesWalker(sourceFile, this.ruleName, {}));
+        return this.applyWithWalker(new NgConsistentNamingWalker(sourceFile, this.ruleName, this._walkerOptions));
     }
 }
