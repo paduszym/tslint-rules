@@ -47,6 +47,23 @@ function getObjectLiteralFromExpression(expression: Expression): any {
     return null;
 }
 
+function isConsistentNgNaming(className: string, classSuffix: string, expression: string,
+                              matcher: (_ngClassName: string, _expression: string) => boolean): boolean {
+    if (typeof expression === "string") {
+        const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
+
+        return matcher(ngClassName, expression);
+    }
+    return true;
+}
+
+function isConsistentFileNaming(fileName: string, className: string, classSuffix: string, fileNameSuffix: string): boolean {
+    const ngFileName: string = basename(fileName, fileNameSuffix);
+    const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
+
+    return dashCaseToCamelCase(`-${ngFileName}`) === ngClassName;
+}
+
 class NgConsistentFilenamesWalker extends AbstractWalker<any> {
 
     walk(sourceFile: SourceFile): void {
@@ -84,58 +101,48 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
     }
 
     private _validateNgModuleNaming(className: string): void {
-        if (!this._isConsistentFileNaming(className, "Module", "module")) {
+        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Module", ".module.ts")) {
             this._addFailure("Niespójność w nazewnictwie modułu Angularowego");
         }
     }
 
     private _validateNgServiceNaming(className: string): void {
-        if (!this._isConsistentFileNaming(className, "Service", "service")) {
+        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Service", ".service.ts")) {
             this._addFailure("Niespójność w nazewnictwie serwisu Angularowego");
         }
     }
 
-    private _validateNgComponentNaming(className: string, params: Expression): void {
-        if (!this._isConsistentFileNaming(className, "Component", "component")) {
+    private _validateNgComponentNaming(className: string, params: any): void {
+        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Component", ".component.ts")) {
             this._addFailure("Niespójność w nazewnictwie komponentu Angularowego");
         }
-        if (!this._isConsistentSelectorNaming(className, "Component", params,
+        if (!isConsistentFileNaming(params["templateUrl"], className, "Component", ".component.html")) {
+            this._addFailure("Niespójność w nazewnictwie szablonu komponentu Angularowego");
+        }
+        if (!isConsistentNgNaming(className, "Component", params["selector"],
                 (ngClassName, selector) => ngClassName === dashCaseToCamelCase(selector.replace(/^test/, "")))) {
             this._addFailure("Selektor niezgodny z nazwą klasy komponentu Angularowego");
         }
     }
 
-    private _validateNgDirectiveNaming(className: string, params: Expression): void {
-        if (!this._isConsistentFileNaming(className, "Directive", "directive")) {
+    private _validateNgDirectiveNaming(className: string, params: any): void {
+        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Directive", ".directive.ts")) {
             this._addFailure("Niespójność w nazewnictwie dyrektywy Angularowej");
         }
-        if (!this._isConsistentSelectorNaming(className, "Directive", params,
+        if (!isConsistentNgNaming(className, "Directive", params["selector"],
                 (ngClassName, selector) => selector.match(new RegExp(`\\[test${ngClassName}\\]`)) !== null)) {
             this._addFailure("Selektor niezgodny z nazwą klasy dyrektywy Angularowej");
         }
     }
 
-    private _validateNgPipeNaming(className: string, params: Expression): void {
-        if (!this._isConsistentFileNaming(className, "Pipe", "pipe")) {
+    private _validateNgPipeNaming(className: string, params: any): void {
+        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Pipe", ".pipe.ts")) {
             this._addFailure("Niespójność w nazewnictwie pipe'a Angularowego");
         }
-    }
-
-    private _isConsistentSelectorNaming(className: string, classSuffix: string, decoratorParams: any,
-                                        matcher: (_ngClassName: string, _selector: string) => boolean): boolean {
-        if (typeof decoratorParams["selector"] === "string") {
-            const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
-
-            return matcher(ngClassName, decoratorParams["selector"]);
+        if (!isConsistentNgNaming(className, "Pipe", params["name"],
+                (ngClassName, name) => name === ngClassName) !== null) {
+            this._addFailure("Nazwa niezgodna z nazwą klasy pipe'a Angularowego");
         }
-        return true;
-    }
-
-    private _isConsistentFileNaming(className: string, classSuffix: string, fileNameSuffix: string): boolean {
-        const ngFileName: string = basename(this.sourceFile.fileName, `.${fileNameSuffix}.ts`);
-        const ngClassName: string = className.replace(new RegExp(`${classSuffix}$`), "");
-
-        return dashCaseToCamelCase(`-${ngFileName}`) === ngClassName;
     }
 
     private _addFailure(message: string): void {
