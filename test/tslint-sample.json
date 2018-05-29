@@ -3,14 +3,14 @@
     "../dist"
   ],
   "rules": {
-//    "no-empty-lines-near-brackets": true,
-//    "consistent-decorators": true,
-//    "require-license-banner": [
-//      true,
-//      {
-//        "bannerFile": "./_sample-license-banner.ts"
-//      }
-//    ],
+    "no-empty-lines-near-brackets": true,
+    "consistent-decorators": true,
+    "require-license-banner": [
+      true,
+      {
+        "bannerFile": "./_sample-license-banner.ts"
+      }
+    ],
     "ng-consistent-naming": [
       true,
       {

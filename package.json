@@ -12,7 +12,7 @@
     "clean": "rimraf ./dist",
     "devel": "tsc -w",
     "prepublishOnly": "npm run-script build",
-    "test": "tslint -c ./test/tslint-sample.json './test/ng-*.ts'"
+    "test": "tslint -c ./test/tslint-sample.json './test/*.ts'"
   },
   "peerDependencies": {
     "tslint": ">=5.9.1",
