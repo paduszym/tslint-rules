@@ -140,7 +140,7 @@ class NgConsistentFilenamesWalker extends AbstractWalker<any> {
             this._addFailure("Niespójność w nazewnictwie pipe'a Angularowego");
         }
         if (!isConsistentNgNaming(className, "Pipe", params["name"],
-                (ngClassName, name) => name === ngClassName) !== null) {
+                (ngClassName, name) => ngClassName === name.replace(/^(.)/, match => match.toUpperCase()))) {
             this._addFailure("Nazwa niezgodna z nazwą klasy pipe'a Angularowego");
         }
     }
