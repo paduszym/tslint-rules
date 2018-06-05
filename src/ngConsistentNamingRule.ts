@@ -32,7 +32,14 @@ interface NgConsistentNamingRuleOptions {
     vendorPrefixes: string[];
 }
 
+function isDashCased(str: string): boolean {
+    return typeof str === "string" && str.match(/^[a-z\-]+$/g) !== null;
+}
+
 function dashCaseToCamelCase(str: string): string {
+    if (!isDashCased(str)) {
+        return null;
+    }
     return str.replace(/-([a-z])/g, g => g[1].toUpperCase());
 }
 
