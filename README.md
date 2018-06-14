@@ -9,9 +9,9 @@ Upewnij się że w pliku `.npmrc` projektu masz wpis definiujący odpowiednie re
 
 Następnie w głównym katalogu projektu (tj. tam gdzie znajduje się plik `package.json`) uruchom:
 
-``
+```
 npm i @opi/tslint-rules -D
-``
+```
 
 ## Konfiguracja
 W konfiguracji `tslint` (domyślnie plik `tslint.json`) dodaj wpis w sekcji `rulesDirectory`:
