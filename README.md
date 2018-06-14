@@ -2,7 +2,12 @@
 Zbiór reguł `tslint` wykorzystywanych w projektach OPI.
 
 ## Instalacja paczki
-W głównym katalogu projektu (tj. tam gdzie znajduje się plik `package.json`) uruchom:
+Upewnij się że w pliku `.npmrc` projektu masz wpis definiujący odpowiednie repozytorium NPM dla projektów OPI:
+```
+@opi:registry=https://lisi-nexus.opi.org.pl/repository/opi-npm/
+```
+
+Następnie w głównym katalogu projektu (tj. tam gdzie znajduje się plik `package.json`) uruchom:
 
 ``
 npm i @opi/tslint-rules -D
