@@ -125,11 +125,12 @@ class NgConsistentNamingWalker extends AbstractWalker<NgConsistentNamingRuleOpti
 
     private _validateNgComponentNaming(className: string, params: any): void {
         const vendorSelectorRegex: RegExp = new RegExp(`^(${this.options.vendorPrefixes.join("|")})`);
+        const isSpecFile: boolean = !/\.spec\.ts$/.test(this.sourceFile.fileName);
 
-        if (!isConsistentFileNaming(this.sourceFile.fileName, className, "Component", ".component.ts")) {
+        if (!isSpecFile && !isConsistentFileNaming(this.sourceFile.fileName, className, "Component", ".component.ts")) {
             this._addFailure("Niespójność w nazewnictwie komponentu Angularowego");
         }
-        if (!isConsistentFileNaming(params["templateUrl"], className, "Component", ".component.html")) {
+        if (params["templateUrl"] && !isConsistentFileNaming(params["templateUrl"], className, "Component", ".component.html")) {
             this._addFailure("Niespójność w nazewnictwie szablonu komponentu Angularowego");
         }
         if (!isConsistentNgNaming(className, "Component", params["selector"],
