@@ -33,7 +33,7 @@ interface NgConsistentNamingRuleOptions {
 }
 
 function isDashCased(str: string): boolean {
-    return typeof str === "string" && str.match(/^[a-z\-]+$/g) !== null;
+    return typeof str === "string" && str.match(/^[a-z0-9\-]+$/g) !== null;
 }
 
 function dashCaseToCamelCase(str: string): string {
